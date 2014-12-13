@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>test</title>
+<meta charset="utf-8">
+</head>
+<body>
+	远程数据：
+	<div id="J_data">
+		&nbsp;
+	</div>	
+	<div>
+		<button id="J_get">获取数据</button>
+		<button id="J_update">更新缓存</button>
+		<button id="J_del">删除缓存</button>
+	</div>
+	本地数据：
+	<div id="J_data_local">
+		&nbsp;
+	</div>	
+	<div>
+		<button id="J_get_local">获取数据</button>
+		<button id="J_update_local">设置数据</button>
+		<button id="J_del_local">删除缓存</button>
+	</div>
+	<div>
+		<button id="J_delete_all">清除所有缓存(已配置的)</button>
+	</div>
+</body>
+<script src="../lib/jquery/2.1.1/jquery.min.js"></script>
+<script src="../src/zcache.js"></script>
+<script type="text/javascript">
+	var cache=new ZCache({
+		cache:{
+			"testData":{
+				key:"test",
+				url:"data/test.json"
+			},
+			"testLocal":{
+				key:"local"
+			}
+		}
+	});
+
+	$('#J_get').on('click',function(){
+		cache.get("testData",'',function(state,json){
+			if(state=="success"){
+				$('#J_data').html(JSON.stringify(json));
+			}else{
+				alert(state);
+			}
+		});
+		/*
+		在保证数据存在的情况下，也可以这样获取数据
+		var data=cache.get("testData")
+		$('#J_data').html(data);
+		*/
+	});
+	$('#J_update').on('click',function(){
+		cache.set("testData",'',function(state,json){
+			if(state=="success"){
+				$('#J_data').html(JSON.stringify(json));
+			}else{
+				alert(state);
+			}
+		});
+	});
+	$('#J_del').on('click',function(){
+		cache.del('testData');
+	})
+
+
+	$('#J_get_local').on('click',function(){
+		var data=cache.get("testLocal");
+		$('#J_data_local').html(data);
+	});
+	$('#J_update_local').on('click',function(){
+		cache.set("testLocal",'test');
+	});
+	$('#J_del_local').on('click',function(){
+		cache.del('testLocal');
+	});
+
+
+	$('#J_delete_all').on('click',function(){
+		cache.clearAll();
+	})
+</script>
+</html>
