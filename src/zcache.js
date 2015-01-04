@@ -143,9 +143,10 @@ ZCache.prototype.clearAll=function(){
         this.utils.remove(cacheKey);
     }
 }
-
-
-
-
-
+ZCache.prototype.addCache=function(c){
+    var cache=this.config.cache;
+    for(var i in c){
+        cache[i]=c[i];
+    }
+}
 

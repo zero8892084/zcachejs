@@ -4,7 +4,7 @@
 <title>test</title>
 <meta charset="utf-8">
 </head>
-<body>
+<body datascope="text">
 	远程数据：
 	<div id="J_data">
 		&nbsp;
@@ -26,9 +26,15 @@
 	<div>
 		<button id="J_delete_all">清除所有缓存(已配置的)</button>
 	</div>
+
+	<div>
+		<textarea id="J_textarea" oninput="textareaInput(this)"></textarea>
+		<button id="J_reload">刷新</button>
+	</div>
 </body>
-<script src="../lib/jquery/2.1.1/jquery.min.js"></script>
+<script src="../lib/jquery/1.8.2/jquery.min.js"></script>
 <script src="../src/zcache.js"></script>
+<script src="../src/ModuleData.js"></script>
 <script type="text/javascript">
 	var cache=new ZCache({
 		cache:{
@@ -84,6 +90,23 @@
 
 	$('#J_delete_all').on('click',function(){
 		cache.clearAll();
+	});
+
+
+	var md=new ModuleData(cache,{
+		key:'_ac',
+		scope:['text']
+	});
+	
+	$('#J_textarea').val(md.get('val'));
+
+	function textareaInput(obj){
+		var val=$(obj).val();
+		md.set('val',val);
+	}	
+	$('#J_reload').on('click',function(){
+		window.location.reload();
 	})
+
 </script>
 </html>
