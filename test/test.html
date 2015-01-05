@@ -28,8 +28,17 @@
 	</div>
 
 	<div>
+		<p>模块数据缓存</p>
 		<textarea id="J_textarea" oninput="textareaInput(this)"></textarea>
 		<button id="J_reload">刷新</button>
+	</div>
+
+	<div>
+		<p>模块数据缓存---二级缓存</p>
+		<div id="J_4"></div>
+		<button id="J_1">设置值</button>
+		<button id="J_2">获取值</button>
+		<button id="J_3">提交缓存</button>
 	</div>
 </body>
 <script src="../lib/jquery/1.8.2/jquery.min.js"></script>
@@ -73,7 +82,7 @@
 	});
 	$('#J_del').on('click',function(){
 		cache.del('testData');
-	})
+	});
 
 
 	$('#J_get_local').on('click',function(){
@@ -93,20 +102,43 @@
 	});
 
 
+	/*模块数据管理*/
 	var md=new ModuleData(cache,{
 		key:'_ac',
-		scope:['text']
+		scope:['text','t2']
 	});
 	
 	$('#J_textarea').val(md.get('val'));
 
 	function textareaInput(obj){
+		md.use('text');
 		var val=$(obj).val();
 		md.set('val',val);
 	}	
 	$('#J_reload').on('click',function(){
 		window.location.reload();
 	})
-
+	/*模块数据管理--二级缓存*/
+	$('#J_1').on('click',function(){
+		md.use('t2');
+		md.set({
+			temp3:3
+		});
+		md.setTemp({
+			temp1:1,
+			temp2:2
+		});
+	});
+	$('#J_2').on('click',function(){
+		md.use('t2');
+		var temp1=md.getTemp('temp1')+''+md.isTemp('temp1');
+		var temp2=md.getTemp('temp2')+''+md.isTemp('temp2');
+		var temp3=md.getTemp('temp3')+''+md.isTemp('temp3');
+		$('#J_4').html(temp1+' '+temp2+' '+temp3+' <br/>'+JSON.stringify(md.getAllTemp()));
+	});
+	$('#J_3').on('click',function(){
+		md.use('t2');
+		md.commit();
+	});
 </script>
 </html>
