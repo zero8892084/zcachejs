@@ -4,7 +4,7 @@
 		scope:['common','','']//缓存域，会有一个默认值common
 	}
 */
-function ModuleData(cacheManager,config){
+function ZModuleData(cacheManager,config){
 	if(!config)config={};
 	this.config=config;
 	this.cacheManager=cacheManager;
@@ -30,12 +30,12 @@ function ModuleData(cacheManager,config){
 		this.curScope=curScope;
 	}
 }
-ModuleData.prototype.use=function(scope){
+ZModuleData.prototype.use=function(scope){
 	if(!scope)scope=this.curScope;
 	if(!this._isInScope(scope)){return;}
 	this.curScope=scope;
 }
-ModuleData.prototype.get=function(name,scope){
+ZModuleData.prototype.get=function(name,scope){
 	if(!scope)scope=this.curScope;
 	if(!this._isInScope(scope)){return undefined;}
 	var json=this._getJson();
@@ -54,7 +54,7 @@ ModuleData.prototype.get=function(name,scope){
 	},'myscope');
 	第二种方式会在数据域中新增传入的key
 */
-ModuleData.prototype.set=function(name,value,scope){
+ZModuleData.prototype.set=function(name,value,scope){
 	if(typeof name == 'object'){
 		scope=value;
 	}
@@ -73,7 +73,7 @@ ModuleData.prototype.set=function(name,value,scope){
 	}
 	this.cacheManager.set(this.config.key,JSON.stringify(json));
 }
-ModuleData.prototype.del=function(scope){
+ZModuleData.prototype.del=function(scope){
 	if(!scope)scope=this.curScope;
 	if(!this._isInScope(scope)){return;}
 	var json=this._getJson();
@@ -82,7 +82,7 @@ ModuleData.prototype.del=function(scope){
 		this.cacheManager.set(this.config.key,JSON.stringify(json));
 	}
 }
-ModuleData.prototype.setTemp=function(name,value,scope){
+ZModuleData.prototype.setTemp=function(name,value,scope){
 	if(typeof name == 'object'){
 		scope=value;
 	}
@@ -102,7 +102,7 @@ ModuleData.prototype.setTemp=function(name,value,scope){
 	}
 	this.cacheManager.set(this.config.key,JSON.stringify(json));
 }
-ModuleData.prototype.getTemp=function(name,scope){
+ZModuleData.prototype.getTemp=function(name,scope){
 	if(!scope)scope=this.curScope;
 	if(!this._isInScope(scope)){return undefined;}
 	var json=this._getJson();
@@ -115,7 +115,7 @@ ModuleData.prototype.getTemp=function(name,scope){
 	}
 	return undefined;
 }
-ModuleData.prototype.isTemp=function(name,scope){
+ZModuleData.prototype.isTemp=function(name,scope){
 	if(!scope)scope=this.curScope;
 	if(!this._isInScope(scope)){return undefined;}
 	var json=this._getJson();
@@ -126,7 +126,7 @@ ModuleData.prototype.isTemp=function(name,scope){
 		return false;
 	}
 }
-ModuleData.prototype.getAllTemp=function(scope){
+ZModuleData.prototype.getAllTemp=function(scope){
 	if(!scope)scope=this.curScope;
 	if(!this._isInScope(scope)){return undefined;}
 	var json=this._getJson();
@@ -137,7 +137,7 @@ ModuleData.prototype.getAllTemp=function(scope){
 		return null;
 	}
 }
-ModuleData.prototype.commit=function(scope){
+ZModuleData.prototype.commit=function(scope){
 	if(!scope)scope=this.curScope;
 	if(!this._isInScope(scope)){return;}
 	var json=this._getJson();
@@ -152,7 +152,7 @@ ModuleData.prototype.commit=function(scope){
 	this.cacheManager.set(this.config.key,JSON.stringify(json));
 }
 /*判断当前scope是否在config中配置过*/
-ModuleData.prototype._isInScope=function(name){
+ZModuleData.prototype._isInScope=function(name){
 	var flag=false;
 	var scope=this.config.scope;
 	for(var i in scope){
@@ -162,7 +162,7 @@ ModuleData.prototype._isInScope=function(name){
 	}
 	return flag;
 }
-ModuleData.prototype._getJson=function(name){
+ZModuleData.prototype._getJson=function(name){
 	var json=this.cacheManager.get(this.config.key);
 	if(!json){
 		json={};

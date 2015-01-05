@@ -4,7 +4,8 @@
             "cachename":{
                 key:"storeKey",
                 url:"",
-                realTime:true
+                realTime:true,
+                maxAge:0//缓存时长,毫秒,默认为0，为0的时候表示无限长
             }
         },
         remoteFun:ajaxfunction
@@ -79,7 +80,10 @@ ZCache.prototype.getRemote=function(name,param,callback){
     //1、缓存中已有数据
     //2、配置中未指定数据是实时的
     //3、访问后端数据的入参相同
-    if(json&&!target.realTime&&json._param==param){
+    //4、缓存数据时长没有超过maxAge
+    var time=new Date().getTime();
+    if(json&&!target.realTime&&json._param==param&&
+        (!parseInt(target.maxAge)||(time-json._create)<parseInt(target.maxAge))){
         callback('success',json);
         return;
     }else{
@@ -96,12 +100,13 @@ ZCache.prototype.updateRemote=function(name,param,callback){
     this.config.remoteFun(target.url,param,{
         success:function(json){
             json._param=param;
+            json._create=new Date().getTime();
             _self.utils.setJson(cacheKey,json);
-            callback('success',json);
+            callback('success',json,true);
         },
         error:function(json){
             _self.del(name);
-            callback('error',json);
+            callback('error',json,true);
         }
     });
 }

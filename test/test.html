@@ -43,13 +43,14 @@
 </body>
 <script src="../lib/jquery/1.8.2/jquery.min.js"></script>
 <script src="../src/zcache.js"></script>
-<script src="../src/ModuleData.js"></script>
+<script src="../src/ZModuleData.js"></script>
 <script type="text/javascript">
 	var cache=new ZCache({
 		cache:{
 			"testData":{
 				key:"test",
-				url:"data/test.json"
+				url:"data/test.json",
+				maxAge:5*60*1000//缓存五分钟
 			},
 			"testLocal":{
 				key:"local"
@@ -103,7 +104,7 @@
 
 
 	/*模块数据管理*/
-	var md=new ModuleData(cache,{
+	var md=new ZModuleData(cache,{
 		key:'_ac',
 		scope:['text','t2']
 	});
