@@ -40,6 +40,14 @@
 		<button id="J_2">获取值</button>
 		<button id="J_3">提交缓存</button>
 	</div>
+	<div>-----------------------------------------</div>
+	<div id="J_ready_text">&nbsp;</div>
+	<button id="J_ready_set">ready方法-设值</button>
+	<div id="J_ready_tx">
+	<button id="J_ready_get">ready方法-取值</button>
+	<div id="J_ready_rm_text">&nbsp;</div>
+	<button id="J_ready_rm">ready方法-ajax</button>
+	</div>
 </body>
 <script src="../lib/jquery/1.8.2/jquery.min.js"></script>
 <script src="../src/zcache.js"></script>
@@ -49,14 +57,16 @@
 		cache:{
 			"testData":{
 				key:"test",
-				url:"data/test.json",
-				maxAge:5*60*1000//缓存五分钟
+				url:"data/test.json"
 			},
 			"testLocal":{
 				key:"local"
 			}
 		}
 	});
+
+	//cache.set('testData',{da:123});
+
 
 	$('#J_get').on('click',function(){
 		cache.get("testData",'',function(state,json){
@@ -66,14 +76,9 @@
 				alert(state);
 			}
 		});
-		/*
-		在保证数据存在的情况下，也可以这样获取数据
-		var data=cache.get("testData")
-		$('#J_data').html(data);
-		*/
 	});
 	$('#J_update').on('click',function(){
-		cache.set("testData",'',function(state,json){
+		cache.updateRemote("testData",'',function(state,json){
 			if(state=="success"){
 				$('#J_data').html(JSON.stringify(json));
 			}else{
@@ -106,15 +111,18 @@
 	/*模块数据管理*/
 	var md=new ZModuleData(cache,{
 		key:'_ac',
-		scope:['text','t2']
+		scope:['text','t2','t3','t4']
 	});
-	
+	md.use('t3');
 	$('#J_textarea').val(md.get('val'));
 
+	//md.setScope({a:123},'t3');
 	function textareaInput(obj){
-		md.use('text');
+		md.use('t3');
 		var val=$(obj).val();
-		md.set('val',val);
+		md.set({
+			val:val
+		});
 	}	
 	$('#J_reload').on('click',function(){
 		window.location.reload();
@@ -139,7 +147,74 @@
 	});
 	$('#J_3').on('click',function(){
 		md.use('t2');
-		md.commit();
+		md.commitTemp();
 	});
+
+	md.use('t4');
+	md.setScope({a:1,b:2});
+	md.setTempScope({a:4,c:5});
+	console.log(md.getTempScope());
+	console.log(md.getScope());
+	md.commitTemp();
+	console.log(md.getTempScope());
+
+
+	md.ready(['text','t2','t3'],function(data){
+		md.on('#J_ready_set','click',function(da){
+			data.text.tedx=1;
+			data.text.tedy=2;
+			data.t2.tdas=3;
+			data.t2.tdad=5;
+			da.text.abc=1111;
+		});
+		data.text.abc=12;
+		md.on('#J_ready_tx','click','#J_ready_get',function(){
+			$('#J_ready_text').html(JSON.stringify(data));
+			md.setTimeout(function(da){
+				da.text.time=new Date();
+				$('#J_ready_text').html(JSON.stringify(data));
+			}, 3000);
+		});
+
+
+		md.on('#J_ready_rm','click',function(da){
+			md.ajax({
+				url: 'data/test.json',
+                dataType: "json",
+                success: function(data,json) {
+                	data.text.json=json;
+                },
+                error: function(data,e) {
+                },
+                complete:function(data){
+                	$('#J_ready_rm_text').html(JSON.stringify(data));
+                }
+			});
+		})
+	});
+
+
+
+	/*$('#J_ready_set').on('click',function(){
+		md.ready(['text','t2'],function(text,t2){
+			text.tedx=1;
+			text.tedy=2;
+			t2.tdas=3;
+			t2.tdad=5;
+		});
+	});
+	$('#J_ready_get').on('click',function(){
+		md.ready(['text'],function(text,t2){
+			var h='text:'+JSON.stringify(text)+'<br>';
+			h+='t2:'+JSON.stringify(t2);
+			$('#J_ready_text').html(h);
+		});
+	});
+
+	md.mdOn('#J_ready_tx','click','#J_ready_get',function(){
+		console.log(1);
+	});*/
+
+
 </script>
 </html>

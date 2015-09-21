@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>文档</title>
+<meta charset="utf-8">
+<link rel="apple-touch-icon" href="touch-icon-iphone.png" />
+<link rel="apple-touch-icon-precomposed" href="touch-icon-iphone.png" />
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1 , user-scalable=no">
+<meta content="telephone=no" name="format-detection" />
+<link rel="stylesheet" type="text/css" href="css/page.css">
+<link rel="stylesheet" type="text/css" href="css/shCoreDefault.css">
+</head>
+<body>
+<div>
+	<div class="head">
+		<div class="nav">
+			<span class="title nav-title-t">ZCache.js</span>
+		</div>
+		<div class="nav-b">
+			<span class="title nav-title-b">ZCache.js</span>
+		</div>
+	</div>
+	<div class="content">
+		<h1 class="h1">
+			<span>简介</span>
+			<!-- <span class="logo">&#x3063;</span> -->
+		</h1>
+		<div class="text">
+			<p class="pg">ZCache.js插件的用于管理前端缓存、数据，支持IE8及以上浏览器和所有的现代浏览器。</p>
+			<p class="pg">通过使用ZCache.js，可以方便的缓存json对象、日期对象、各种基本类型、方法等,可以用于跨页面间通讯、缓存应用全局数据、收集错误信息等。
+			</p>
+			<p class="pg">通过指定ajax方法，还可以实现获取后端数据，自动缓存起来。下一次使用的时候，可以自动从缓存获取，从而减少响应时间。还可以指定后端数据的缓存时限、访问次数等，以确保数据的正确性。</p>
+			<p class="pg">ZCache.js内置的ajax方法依赖于jQuery。</p>
+		</div>
+
+		<h1 class="h1">
+			<span>开始</span>
+			<!-- <span class="logo">&#x3063;</span> -->
+		</h1>
+		<div class="text">
+			<p class="pg">1、配置缓存</p>
+			<pre  class="brush: js;">
+				var config={
+					"test":{
+						key:"test",//存储的键
+						url:"data/test.json"//后端数据地址
+					}
+				}
+			</pre>
+			<p class="pg">2、初始化</p>
+			<pre  class="brush: js;">
+				&lt;script src="../src/zcache.js"&gt;&lt;/script&gt;
+
+				var cache=new ZCache({cache:config});
+			</pre>
+			<p class="pg">3、获取后端数据</p>		
+			<pre  class="brush: js;">
+				cache.get("testData",'',function(state,json){
+					if(state=="success"){
+						$('#J_data').html(JSON.stringify(json));
+					}else{
+						alert(state);
+					}
+				});
+			</pre>
+		</div>
+		<h1 class="h1">
+			<span>options</span>
+			<!-- <span class="logo">&#x3063;</span> -->
+		</h1>
+		<div class="text">
+			<p class="pg">初始化配置选项</p>
+			<pre  class="brush: js;">
+				var cache=new ZCache(options);
+			</pre>
+			<p class="pg">主要有以下属性：</p>
+			<p class="pg">cache:缓存配置，配置缓存的键、缓存时长、读取次数等。必填属性。</p>
+			<p class="pg">remote:自定义后端数据获取方法,如果不配置那么将使用内置的方法。</p>
+		</div>
+		<h1 class="h1">
+			<span>options.cache</span>
+			<!-- <span class="logo">&#x3063;</span> -->
+		</h1>
+		<div class="text">
+			<p class="pg">缓存配置，配置缓存的键、缓存时长、读取次数等。必填属性。</p>
+			<p class="pg">有以下属性：</p>
+			<p class="pg">key:缓存的键。必填属性。</p>
+			<p class="pg">url:后端数据地址。当不指定这个参数时，maxAge、count属性失效。</p>
+			<p class="pg">maxAge:缓存有效时长。值是一个时间长度，以毫秒为单位。</p>
+			<p class="pg">count:缓存可用次数。最小值为1，当访问次数超过时，就会刷新缓存。</p>
+			<pre  class="brush: js;">
+				cache:{
+					"testData":{
+						key:"test",
+						url:"data/test.json",
+						maxAge:5*60*1000,//缓存五分钟
+						count:2//访问次数
+					},
+					"testLocal":{
+						key:"local"
+					}
+				}
+			</pre>
+			<p class="pg">建议将所有配置写到一起，以便统一管理，避免出现重名导致数据被覆盖等问题。</p>
+		</div>
+		<h1 class="h1">
+			<span>ZCache.get()</span>
+			<!-- <span class="logo">&#x3063;</span> -->
+		</h1>
+		<div class="text">
+			<p class="pg">ZCache.get()方法用于获取缓存的数据，有以下两种调用方法。</p>
+			<p class="pg">1、ZCache.get(cacheName)</p>
+			<p class="pg">只传入cacheName，那么会从缓存获取数据。cacheName就是在options.cache中配置的值。这种方式不会从后端数据，而是直接从缓存中取出。返回对象的类型与存入的时候相同。</p>
+			<pre  class="brush: js;">
+				var test=new ZCache({cache:{
+					"test":{"key":"te"}
+				}}).get("test");
+			</pre>
+			<p class="pg">2、ZCache.get(cacheName,[otherParam])</p>
+			<p class="pg">这种方式会尝试去后端获取数据，并将数据缓存起来。[otherParam]可以通过remote选项来自定义。默认的remote定义的[otherParam]如下：ZCache.get(cacheName,param,callback)，param为ajax请求的入参，callback为回调方法。</p>
+			<p class="pg">示例请参考开始。</p>
+		</div>
+		<h1 class="h1">
+			<span>ZCache.set(cacheName,data)</span>
+			<!-- <span class="logo">&#x3063;</span> -->
+		</h1>
+		<div class="text">
+			<p class="pg">ZCache.set()方法用于将数据保存到缓存中。可以存入任何类型的数据。可以通过ZCache.get()获取存入的数据。</p>
+			<pre  class="brush: js;">
+				new ZCache({cache:{
+					"test":{"key":"te"}
+				}}).set("test",new Date());
+			</pre>
+		</div>
+		<h1 class="h1">
+			<span>ZCache.updateRemote(cacheName,[otherParam])</span>
+			<!-- <span class="logo">&#x3063;</span> -->
+		</h1>
+		<div class="text">
+			<p class="pg">入参和ZCache相同。这个方法将强制更新缓存的后端数据，即会发送新的请求，然后将得到的数据覆盖原来的数据。</p>
+			<pre  class="brush: js;">
+				new ZCache({cache:{
+					"test":{"key":"te"}
+				}}).set("test",new Date());
+			</pre>
+		</div>
+		<h1 class="h1">
+			<span>options.remote</span>
+			<!-- <span class="logo">&#x3063;</span> -->
+		</h1>
+		<div class="text">
+			<p class="pg">自定义获取后端数据的方法。该对象有三个属性：</p>
+			<p class="pg">1、func。获取后端数据的方法，该方法有两个入参：args、tools。</p>
+			<p class="pg">args是ZCache.get()和ZCache.updateRemote()的入参组成的列表。</p>
+			<p class="pg">tools是工具对象，有以下方法：</p>
+			<p class="pg">tools.getUrl()可以获取和cacheName对应的URL。</p>
+			<p class="pg">tools.tag(tagVal,tagIndex)可以为当前缓存对象指定一个标记，标记改变时缓存失效。</p>
+			<p class="pg">tools.success(args,data)，当请求到数据之后调用，通知插件请求已获得数据。</p>
+			<p class="pg">tools.error(args)，请求错误后调用，通知插件。</p>
+			<p class="pg">2、success。指定获取到数据之后的回调函数格式。</p>
+			<p class="pg">3、error。指定错误之后回调函数的格式。</p>
+			<pre  class="brush: js;">
+				
+				var options={
+					remote:{
+		                func:function(args,tools){
+		                    $.ajax({
+		                        url: tools.getUrl(),
+		                        data : args[1],
+		                        dataType: "HTML",
+		                        success: function(json) {
+		                            tools.tag(args[1],1);
+		                            tools.success(args,json);
+		                        },
+		                        error: function(e) {
+		                            tools.error(args);
+		                        }
+		                    });
+		                },
+		                success:function(args,html){
+		                	args[2](html);
+		                },
+		                error:function(args){
+		                	args[3]();
+		                }
+		            },
+		            cache:{
+			            test:{
+				            key:'tset',
+				            url:'1.html'
+				        }
+			        }
+				}
+				var cache=new ZCache(options);
+
+	            //ZCache.get(cacheName,param,suCallback,errorCallback)
+	            cache.get('test','a=1&b=2',function(html){
+	            	//成功之后的操作
+	        	},function(){
+	        		//失败之后的操作
+	        	});				
+			</pre>
+		</div>
+	</div>
+	<!-- <pre class="brush: js;">
+	function helloSyntaxHighlighter()
+	{
+		return "hi!";
+	}
+	</pre> -->
+</div>
+<script src="js/syntaxhighlighter/3.0.83/shCore.js"></script>
+<script src="js/syntaxhighlighter/3.0.83/shBrushJScript.js"></script>
+<script src="js/jquery/1.8.2/jquery.min.js"></script>
+<script type="text/javascript">
+	SyntaxHighlighter.all();
+</script>
+</body>
+</html>

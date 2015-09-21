@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>文档</title>
+<meta charset="utf-8">
+<link rel="apple-touch-icon" href="touch-icon-iphone.png" />
+<link rel="apple-touch-icon-precomposed" href="touch-icon-iphone.png" />
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1 , user-scalable=no">
+<meta content="telephone=no" name="format-detection" />
+<link rel="stylesheet" type="text/css" href="css/page.css">
+<link rel="stylesheet" type="text/css" href="css/shCoreDefault.css">
+</head>
+<body>
+<div>
+	<div class="head">
+		<div class="nav">
+			<span class="title nav-title-t">ZModuleData.js</span>
+		</div>
+		<div class="nav-b">
+			<span class="title nav-title-b">ZModuleData.js</span>
+		</div>
+	</div>
+	<div class="content">
+		<h1 class="h1">
+			<span>简介</span>
+			<!-- <span class="logo">&#x3063;</span> -->
+		</h1>
+		<div class="text">
+			<p class="pg">ZModuleData.js基于ZCache，将数据分模块管理。</p>
+			<p class="pg">ZModuleData可以实现多个页面间数据的统一。在移动端开发业务的时候，一个功能常常要分割成多个页面，使用ZModuleData可以实现多页面间操作同一个数据模块，减少开发复杂度。</p>
+		</div>
+		<h1 class="h1">
+			<span>开始</span>
+			<!-- <span class="logo">&#x3063;</span> -->
+		</h1>
+		<div class="text">
+			<p class="pg">1、初始化</p>
+			<pre  class="brush: js;">
+				var md=new ZModuleData(new ZCache(),{
+					scope:['test','test1','test2']
+				});
+			</pre>
+			<p class="pg">2、应用作用域</p>
+			<pre  class="brush: js;">
+				md.ready(['test','test1'],function(data){
+					data.test.a=1;
+					data.test1.b=2;
+				});
+			</pre>
+			<p class="pg">当页面刷新或者切换之后，只要应用了对应的数据域，那么都可以获取到相应的数据。</p>
+		</div>
+
+		<h1 class="h1">
+			<span>ZModuleData.ready(scopeArr,fuc)方法</span>
+			<!-- <span class="logo">&#x3063;</span> -->
+		</h1>
+		<div class="text">
+			<p class="pg">ZModuleData.ready(scopeArr,fuc)用于加载模块数据以及提供执行环境。scopeArr是模块名数组，被声明的模块都会被加载。fuc(data)是提供的执行上下文，它有一个入参data,data中包含了被加载的数据模块，对data的修改都会自动保存到缓存中。</p>
+			<pre  class="brush: js;">
+				md.ready(['test','test1'],function(data){
+					//执行环境
+					data.test.a=1;//这里的修改会被自动存储到缓存中
+					data.test1.b=2;
+				});
+			</pre>
+			<p class="pg">注意：在执行环境中如果使用setTimeout或者注册事件回调(如onclick)等，会使运行跳出运行环境，这时候需要调用ZModuleData.mcb()加工回调方法，使其仍在运行环境中。</p>
+		</div>
+		<h1 class="h1">
+			<span>ZModuleData.mcb(callback)方法</span>
+			<!-- <span class="logo">&#x3063;</span> -->
+		</h1>
+		<div class="text">
+			<p class="pg">用于处理那些会跳出执行环境的回调方法(比如各种事件回调、setTimeout、ajax回调等)，使其在执行环境中执行。</p>
+			<pre  class="brush: js;">
+				md.ready(['test','test1'],function(data){
+					setTimeout(md.mcb(function(d1){
+						d1.test.a=2;
+					}),3000);
+					$('#test').on('click',md.mcb(function(d2,event){
+						d2.test1.b=1;
+						data.test1.a=3;//修改外部data也会保存到缓存中
+					}));
+				});
+			</pre>
+			<p class="pg">在回调函数被ZModuleData.mcb()处理过之后，第一个入参将变成加载的数据模块，而原先的入参将从第二个开始。这时候在方法内操作数据模块，所有的改动都会存储到缓存中。在方法里使用闭包的方式修改的数据模块也会被存储。</p>
+		</div>
+
+		<h1 class="h1">
+			<span>ZModuleData.getScope(scope)方法</span>
+			<!-- <span class="logo">&#x3063;</span> -->
+		</h1>
+		<div class="text">
+			<p class="pg">ZModuleData.getScope(scope)方法可以获得某个数据模块。修改这个方法获得的对象时，不会自动存储到缓存中，需要调用setScope()方法进行手动存储。</p>
+			<pre  class="brush: js;">
+				var test1=md.getScope('test1');
+			</pre>
+		</div>
+		<h1 class="h1">
+			<span>ZModuleData.setScope(obj,scope)方法</span>
+			<!-- <span class="logo">&#x3063;</span> -->
+		</h1>
+		<div class="text">
+			<p class="pg">ZModuleData.setScope(obj,scope)方法可以设置指定的数据模块。</p>
+			<pre  class="brush: js;">
+				var test1=md.setScope({a:1,b:2},'test1');
+			</pre>
+		</div>
+
+
+
+		<h1 class="h1">
+			<span>ZModuleData.setTempScope(obj,scope)方法</span>
+			<!-- <span class="logo">&#x3063;</span> -->
+		</h1>
+		<div class="text">
+			<p class="pg">为指定数据模块设置预缓存。在很多场景下并不希望对数据模块进行修改，这时候可以对数据模块进行预修改。比如需要对某条数据进行修改，修改页面如果直接对这条数据对应的缓存进行修改，那么假设提交失败或者操作者没有进行提交，那么被修改的数据就不能回退了，这时候就需要使用预修改功能，只对数据模块进行预修改，提交之后才会产生修改。</p>
+			<pre  class="brush: js;">
+				md.setScope({a:0,b:2},'test1');
+				md.setTempScope({a:1},'test1');
+				var test1=md.getScope('test1');//这时候获取的值是原来的值{a:0,b:2}
+			</pre>
+		</div>
+
+		<h1 class="h1">
+			<span>ZModuleData.getTempScope(obj,scope)方法</span>
+			<!-- <span class="logo">&#x3063;</span> -->
+		</h1>
+		<div class="text">
+			<p class="pg">获取做了预修改的缓存的数据模块。如果没有进行修改，那么会返回原本的数据模块。</p>
+			<pre  class="brush: js;">
+				md.setScope({a:0,b:2},'test1');
+				md.setTempScope({a:1},'test1');
+				var test1=md.getScope('test1');//这时候获取的值是原来的值{a:0,b:2}
+				var test1Temp=md.getTempScope('test1');//这时候获取的值是修改过的值{a:1,b:2}
+			</pre>
+		</div>
+
+		<h1 class="h1">
+			<span>ZModuleData.commitTemp(scope)方法</span>
+			<!-- <span class="logo">&#x3063;</span> -->
+		</h1>
+		<div class="text">
+			<p class="pg">提交预修改，使得这些修改变成真正的修改。</p>
+			<pre  class="brush: js;">
+				md.setScope({a:0,b:2},'test1');
+				md.setTempScope({a:1},'test1');
+				md.commitTemp('test1');
+				var test1=md.getScoep('test1');//这时候获取的对象是{a:1,b:2}
+			</pre>
+		</div>
+	</div>
+	<!-- <pre class="brush: js;">
+	function helloSyntaxHighlighter()
+	{
+		return "hi!";
+	}
+	</pre> -->
+</div>
+<script src="js/syntaxhighlighter/3.0.83/shCore.js"></script>
+<script src="js/syntaxhighlighter/3.0.83/shBrushJScript.js"></script>
+<script src="js/jquery/1.8.2/jquery.min.js"></script>
+<script type="text/javascript">
+	SyntaxHighlighter.all();
+</script>
+</body>
+</html>
